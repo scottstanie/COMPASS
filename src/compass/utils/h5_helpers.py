@@ -53,9 +53,9 @@ def init_geocoded_dataset(geocoded_group, dataset_name, geo_grid, dtype,
     # We should label appropriate arrays as scales and attach them to datasets
     # explicitly as show below.
     x_ds.make_scale()
-    geocoded_ds.dims[0].attach_scale(x_ds)
+    geocoded_ds.dims[1].attach_scale(x_ds)
     y_ds.make_scale()
-    geocoded_ds.dims[1].attach_scale(y_ds)
+    geocoded_ds.dims[0].attach_scale(y_ds)
 
     # Associate grid mapping with data - projection created later
     geocoded_ds.attrs['grid_mapping'] = np.string_("projection")
@@ -87,7 +87,7 @@ def init_geocoded_dataset(geocoded_group, dataset_name, geo_grid, dtype,
 
     # Geodetic latitude / longitude
     if geo_grid.epsg == 4326:
-        #Set up grid mapping
+        # Set up grid mapping
         projection_ds.attrs['grid_mapping_name'] = np.string_('latitude_longitude')
         projection_ds.attrs['longitude_of_prime_meridian'] = 0.0
 
