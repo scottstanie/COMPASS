@@ -34,38 +34,21 @@ def load_validate_yaml(yaml_path: str, workflow_name: str) -> dict:
     dict
         Validated user runconfig dict with defaults inserted
     """
-    error_channel = journal.error('runconfig.load_validate_yaml')
-
-    try:
-        # Load schema corresponding to 'workflow_name' and to validate against
-        schema_name = workflow_name if workflow_name == 's1_cslc_geo' \
-            else 's1_cslc_radar'
-        schema = yamale.make_schema(
-            f'{helpers.WORKFLOW_SCRIPTS_DIR}/schemas/{schema_name}.yaml',
-            parser='ruamel')
-    except:
-        err_str = f'unable to load schema for workflow {workflow_name}.'
-        error_channel.log(err_str)
-        raise ValueError(err_str)
-
-    # load yaml file or string from command line
-    if os.path.isfile(yaml_path):
-        try:
-            data = yamale.make_data(yaml_path, parser='ruamel')
-        except yamale.YamaleError as yamale_err:
-            err_str = f'Yamale unable to load {workflow_name} runconfig yaml {yaml_path} for validation.'
-            error_channel.log(err_str)
-            raise yamale.YamaleError(err_str) from yamale_err
-    else:
+    if not os.path.isfile(yaml_path):
         raise FileNotFoundError(f'Yaml file {yaml_path} not found.')
 
+    # Load schema corresponding to 'workflow_name' and to validate against
+    schema_name = workflow_name if workflow_name == 's1_cslc_geo' \
+        else 's1_cslc_radar'
+    schema = yamale.make_schema(
+        f'{helpers.WORKFLOW_SCRIPTS_DIR}/schemas/{schema_name}.yaml',
+        parser='ruamel')
+
+    # load yaml file or string from command line
+    data = yamale.make_data(yaml_path, parser='ruamel')
+
     # validate yaml file taken from command line
-    try:
-        yamale.validate(schema, data)
-    except yamale.YamaleError as yamale_err:
-        err_str = f'Validation fail for {workflow_name} runconfig yaml {yaml_path}.'
-        error_channel.log(err_str)
-        raise yamale.YamaleError(err_str) from yamale_err
+    yamale.validate(schema, data)
 
     # load default runconfig
     parser = YAML(typ='safe')
