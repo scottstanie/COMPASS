@@ -7,8 +7,10 @@ import os
 from pathlib import Path
 
 import isce3
-import geopandas as gpd
-from shapely.geometry import box
+import fiona
+from shapely.geometry import box, shape
+import shapely.ops
+from pyproj import Transformer
 import numpy as np
 
 import rasterio
@@ -619,14 +621,19 @@ def _get_valid_pixel_mask(arr_cslc):
     return valid_pixel_index
 
 
+def _read_land_shape():
+    with fiona.open(LAND_GPKG_FILE) as f:
+        return shape(next(iter(f))["geometry"]), f.crs
+
+
+def _warp_shape(polygon, from_epsg: int, to_epsg: int):
+    t = Transformer.from_crs(f"EPSG:{from_epsg}", f"EPSG:{to_epsg}", always_xy=True)
+    return shapely.ops.transform(t.transform, polygon)
+
+
 def _get_land_mask(epsg_cslc: int, geotransform: tuple, shape_mask: tuple):
     # Load the shapefile into a GeoDataFrame
-    if os.path.exists(LAND_GPKG_FILE):
-        gdf1 = gpd.read_file(LAND_GPKG_FILE)
-    else:
-        raise RuntimeError('Cannot find a land mask GPKG file for '
-                           f'pixel classification: {LAND_GPKG_FILE}')
-
+    land_polygon = _read_land_shape()
     # Create a bounding box (minx, miny, maxx, maxy)
     xmin = geotransform[0]
     ymin = geotransform[3] + geotransform[5] * shape_mask[0]
@@ -636,28 +643,30 @@ def _get_land_mask(epsg_cslc: int, geotransform: tuple, shape_mask: tuple):
     bbox = box(xmin, ymin, xmax, ymax)
 
     # Make sure the CRS of the bounding box is the same as the GeoDataFrame
-    bbox = gpd.GeoSeries([bbox], crs=f'EPSG:{epsg_cslc}')
     if epsg_cslc != 3413:
-        bbox_3413 = bbox.to_crs('EPSG:3413')
+        bbox_3413 = _warp_shape(bbox, epsg_cslc, 3413)
+    else:
+        bbox_3413 = bbox
 
     # Check if the polygon intersects with the bounding box.
-    if not gdf1.geometry.iloc[0].intersects(bbox_3413.iloc[0]):
+    if not land_polygon.intersects(bbox_3413):
         # no overlap
         return np.full(shape_mask, False)
 
     # Perform the intersection
-    intersection_3413 = gdf1.geometry.iloc[0].intersection(bbox_3413.iloc[0])
-    intersection_gs = gpd.GeoSeries([intersection_3413], crs='EPSG:3413')
+    intersection_polygon_3413 = land_polygon.intersection(bbox_3413.iloc[0])
 
     if epsg_cslc != 3413:
-        intersection_gs = intersection_gs.to_crs(f'EPSG:{epsg_cslc}')
+        intersection_polygon = _warp_shape(intersection_polygon_3413, 3413, epsg_cslc)
+    else:
+        intersection_polygon = intersection_polygon_3413
 
     tform_bbox = rasterio.transform.from_bounds(xmin, ymin, xmax, ymax,
                                                 shape_mask[1], shape_mask[0])
 
-    image = rasterize(intersection_gs.geometry,
+    image = rasterize(intersection_polygon,
                       transform=tform_bbox,
                       out_shape=shape_mask,
                       dtype=np.uint8, default_value=1)
-    
+
     return image
