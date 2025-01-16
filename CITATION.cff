@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "COMPASS: COregistered Multi-temPorAl Sar Slc"
+type: software
+authors:
+  - family-names: Brancato
+    given-names: Virginia
+    orcid: https://orcid.org/0000-0001-6322-0439
+  - family-names: Jeong
+    given-names: Seongsu
+    orcid: https://orcid.org/0000-0002-6844-5925
+  - family-names: Fattahi
+    given-names: Heresh
+    orcid: https://orcid.org/0000-0001-6926-4387
+  - family-names: Yu
+    given-names: Liang
+repository-code: "https://github.com/opera-adt/COMPASS"
+abstract: "COMPASS (COregistered Multi-temPorAl Sar Slc) is a software package for processing SAR data."
+keywords:
+  - SAR
+  - InSAR
+  - remote sensing
+  - coregistration
+license: "Apache 2.0"
+version: "0.5.5"
+date-released: 2024-03-15
