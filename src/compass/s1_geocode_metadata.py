@@ -66,7 +66,7 @@ def _fix_layover_shadow_mask(static_layers_dict, h5_root, geo_grid,
         desc = 'Layover shadow mask. 0=no layover, no shadow; 1=shadow; 2=layover; 3=shadow and layover.'
         _ = init_geocoded_dataset(h5_root[DATA_PATH], dst_ds_name, geo_grid,
                                   dtype=None,
-                                  description=np.string_(desc),
+                                  description=np.bytes_(desc),
                                   data=temp_arr, output_cfg=output_params)
 
 
@@ -163,11 +163,11 @@ def run(cfg, burst, fetch_from_scratch=False):
 
         # Global attributes for static layers
         h5_root.attrs['conventions'] = "CF-1.8"
-        h5_root.attrs["contact"] = np.string_(OPERA_OPERATION_CONTACT_EMAIL)
-        h5_root.attrs["institution"] = np.string_("NASA JPL")
-        h5_root.attrs["project_name"] = np.string_("OPERA")
-        h5_root.attrs["reference_document"] = np.string_("JPL-108762")
-        h5_root.attrs["title"] = np.string_("OPERA_L2_CSLC-S1-STATIC Product")
+        h5_root.attrs["contact"] = np.bytes_(OPERA_OPERATION_CONTACT_EMAIL)
+        h5_root.attrs["institution"] = np.bytes_("NASA JPL")
+        h5_root.attrs["project_name"] = np.bytes_("OPERA")
+        h5_root.attrs["reference_document"] = np.bytes_("JPL-108762")
+        h5_root.attrs["title"] = np.bytes_("OPERA_L2_CSLC-S1-STATIC Product")
 
         # write identity and metadata to HDF5
         root_group = h5_root[ROOT_PATH]

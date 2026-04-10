@@ -39,10 +39,10 @@ class Meta:
 
 def _as_np_string_if_needed(val):
     '''
-    If type str encountered, convert and return as np.string_. Otherwise return
+    If type str encountered, convert and return as np.bytes_. Otherwise return
     as is.
     '''
-    val = np.string_(val) if isinstance(val, str) else val
+    val = np.bytes_(val) if isinstance(val, str) else val
     return val
 
 
@@ -157,7 +157,7 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
     cslc_ds.dims[0].attach_scale(y_ds)
 
     # Associate grid mapping with data - projection created later
-    cslc_ds.attrs['grid_mapping'] = np.string_("projection")
+    cslc_ds.attrs['grid_mapping'] = np.bytes_("projection")
 
     grid_meta_items = [
         Meta('x_spacing', geo_grid.spacing_x,
@@ -179,12 +179,12 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
     projection_ds[()] = geo_grid.epsg
 
     # Add description as an attribute to projection
-    projection_ds.attrs['description'] = np.string_("Projection system")
+    projection_ds.attrs['description'] = np.bytes_("Projection system")
 
     # WGS84 ellipsoid
     projection_ds.attrs['semi_major_axis'] = 6378137.0
     projection_ds.attrs['inverse_flattening'] = 298.257223563
-    projection_ds.attrs['ellipsoid'] = np.string_("WGS84")
+    projection_ds.attrs['ellipsoid'] = np.bytes_("WGS84")
 
     # Additional fields
     projection_ds.attrs['epsg_code'] = geo_grid.epsg
@@ -192,7 +192,7 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
     # CF 1.7+ requires this attribute to be named "crs_wkt"
     # spatial_ref is old GDAL way. Using that for testing only.
     # For NISAR replace with "crs_wkt"
-    projection_ds.attrs['spatial_ref'] = np.string_(srs.ExportToWkt())
+    projection_ds.attrs['spatial_ref'] = np.bytes_(srs.ExportToWkt())
 
     # Here we have handcoded the attributes for the different cases
     # Recommended method is to use pyproj.CRS.to_cf() as shown above
@@ -201,38 +201,38 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
     # Geodetic latitude / longitude
     if geo_grid.epsg == 4326:
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_('latitude_longitude')
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_('latitude_longitude')
         projection_ds.attrs['longitude_of_prime_meridian'] = 0.0
 
         #Setup units for x and y
-        x_ds.attrs['standard_name'] = np.string_("longitude")
-        x_ds.attrs['units'] = np.string_("degrees_east")
+        x_ds.attrs['standard_name'] = np.bytes_("longitude")
+        x_ds.attrs['units'] = np.bytes_("degrees_east")
 
-        y_ds.attrs['standard_name'] = np.string_("latitude")
-        y_ds.attrs['units'] = np.string_("degrees_north")
+        y_ds.attrs['standard_name'] = np.bytes_("latitude")
+        y_ds.attrs['units'] = np.bytes_("degrees_north")
 
     # UTM zones
     elif (geo_grid.epsg > 32600 and geo_grid.epsg < 32661) or \
          (geo_grid.epsg > 32700 and geo_grid.epsg < 32761):
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_('universal_transverse_mercator')
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_('universal_transverse_mercator')
         projection_ds.attrs['utm_zone_number'] = geo_grid.epsg % 100
 
         #Setup units for x and y
-        x_ds.attrs['description'] = np.string_("CF compliant dimension associated with the X coordinate")
-        x_ds.attrs['standard_name'] = np.string_("projection_x_coordinate")
-        x_ds.attrs['long_name'] = np.string_("x coordinate of projection")
-        x_ds.attrs['units'] = np.string_("meters")
+        x_ds.attrs['description'] = np.bytes_("CF compliant dimension associated with the X coordinate")
+        x_ds.attrs['standard_name'] = np.bytes_("projection_x_coordinate")
+        x_ds.attrs['long_name'] = np.bytes_("x coordinate of projection")
+        x_ds.attrs['units'] = np.bytes_("meters")
 
-        y_ds.attrs['description'] = np.string_("CF compliant dimension associated with the Y coordinate")
-        y_ds.attrs['standard_name'] = np.string_("projection_y_coordinate")
-        y_ds.attrs['long_name'] = np.string_("y coordinate of projection")
-        y_ds.attrs['units'] = np.string_("meters")
+        y_ds.attrs['description'] = np.bytes_("CF compliant dimension associated with the Y coordinate")
+        y_ds.attrs['standard_name'] = np.bytes_("projection_y_coordinate")
+        y_ds.attrs['long_name'] = np.bytes_("y coordinate of projection")
+        y_ds.attrs['units'] = np.bytes_("meters")
 
     # Polar Stereo North
     elif geo_grid.epsg == 3413:
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_("polar_stereographic")
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_("polar_stereographic")
         projection_ds.attrs['latitude_of_projection_origin'] = 90.0
         projection_ds.attrs['standard_parallel'] = 70.0
         projection_ds.attrs['straight_vertical_longitude_from_pole'] = -45.0
@@ -240,18 +240,18 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
         projection_ds.attrs['false_northing'] = 0.0
 
         #Setup units for x and y
-        x_ds.attrs['standard_name'] = np.string_("projection_x_coordinate")
-        x_ds.attrs['long_name'] = np.string_("x coordinate of projection")
-        x_ds.attrs['units'] = np.string_("m")
+        x_ds.attrs['standard_name'] = np.bytes_("projection_x_coordinate")
+        x_ds.attrs['long_name'] = np.bytes_("x coordinate of projection")
+        x_ds.attrs['units'] = np.bytes_("m")
 
-        y_ds.attrs['standard_name'] = np.string_("projection_y_coordinate")
-        y_ds.attrs['long_name'] = np.string_("y coordinate of projection")
-        y_ds.attrs['units'] = np.string_("m")
+        y_ds.attrs['standard_name'] = np.bytes_("projection_y_coordinate")
+        y_ds.attrs['long_name'] = np.bytes_("y coordinate of projection")
+        y_ds.attrs['units'] = np.bytes_("m")
 
     # Polar Stereo south
     elif geo_grid.epsg == 3031:
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_("polar_stereographic")
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_("polar_stereographic")
         projection_ds.attrs['latitude_of_projection_origin'] = -90.0
         projection_ds.attrs['standard_parallel'] = -71.0
         projection_ds.attrs['straight_vertical_longitude_from_pole'] = 0.0
@@ -259,36 +259,36 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
         projection_ds.attrs['false_northing'] = 0.0
 
         #Setup units for x and y
-        x_ds.attrs['standard_name'] = np.string_("projection_x_coordinate")
-        x_ds.attrs['long_name'] = np.string_("x coordinate of projection")
-        x_ds.attrs['units'] = np.string_("m")
+        x_ds.attrs['standard_name'] = np.bytes_("projection_x_coordinate")
+        x_ds.attrs['long_name'] = np.bytes_("x coordinate of projection")
+        x_ds.attrs['units'] = np.bytes_("m")
 
-        y_ds.attrs['standard_name'] = np.string_("projection_y_coordinate")
-        y_ds.attrs['long_name'] = np.string_("y coordinate of projection")
-        y_ds.attrs['units'] = np.string_("m")
+        y_ds.attrs['standard_name'] = np.bytes_("projection_y_coordinate")
+        y_ds.attrs['long_name'] = np.bytes_("y coordinate of projection")
+        y_ds.attrs['units'] = np.bytes_("m")
 
     # EASE 2 for soil moisture L3
     elif geo_grid.epsg == 6933:
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_("lambert_cylindrical_equal_area")
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_("lambert_cylindrical_equal_area")
         projection_ds.attrs['longitude_of_central_meridian'] = 0.0
         projection_ds.attrs['standard_parallel'] = 30.0
         projection_ds.attrs['false_easting'] = 0.0
         projection_ds.attrs['false_northing'] = 0.0
 
         #Setup units for x and y
-        x_ds.attrs['standard_name'] = np.string_("projection_x_coordinate")
-        x_ds.attrs['long_name'] = np.string_("x coordinate of projection")
-        x_ds.attrs['units'] = np.string_("m")
+        x_ds.attrs['standard_name'] = np.bytes_("projection_x_coordinate")
+        x_ds.attrs['long_name'] = np.bytes_("x coordinate of projection")
+        x_ds.attrs['units'] = np.bytes_("m")
 
-        y_ds.attrs['standard_name'] = np.string_("projection_y_coordinate")
-        y_ds.attrs['long_name'] = np.string_("y coordinate of projection")
-        y_ds.attrs['units'] = np.string_("m")
+        y_ds.attrs['standard_name'] = np.bytes_("projection_y_coordinate")
+        y_ds.attrs['long_name'] = np.bytes_("y coordinate of projection")
+        y_ds.attrs['units'] = np.bytes_("m")
 
     # Europe Equal Area for Deformation map (to be implemented in isce3)
     elif geo_grid.epsg == 3035:
         #Set up grid mapping
-        projection_ds.attrs['grid_mapping_name'] = np.string_("lambert_azimuthal_equal_area")
+        projection_ds.attrs['grid_mapping_name'] = np.bytes_("lambert_azimuthal_equal_area")
         projection_ds.attrs['longitude_of_projection_origin']= 10.0
         projection_ds.attrs['latitude_of_projection_origin'] = 52.0
         projection_ds.attrs['standard_parallel'] = -71.0
@@ -297,13 +297,13 @@ def init_geocoded_dataset(grid_group, dataset_name, geo_grid, dtype,
         projection_ds.attrs['false_northing'] = 3210000.0
 
         #Setup units for x and y
-        x_ds.attrs['standard_name'] = np.string_("projection_x_coordinate")
-        x_ds.attrs['long_name'] = np.string_("x coordinate of projection")
-        x_ds.attrs['units'] = np.string_("m")
+        x_ds.attrs['standard_name'] = np.bytes_("projection_x_coordinate")
+        x_ds.attrs['long_name'] = np.bytes_("x coordinate of projection")
+        x_ds.attrs['units'] = np.bytes_("m")
 
-        y_ds.attrs['standard_name'] = np.string_("projection_y_coordinate")
-        y_ds.attrs['long_name'] = np.string_("y coordinate of projection")
-        y_ds.attrs['units'] = np.string_("m")
+        y_ds.attrs['standard_name'] = np.bytes_("projection_y_coordinate")
+        y_ds.attrs['long_name'] = np.bytes_("y coordinate of projection")
+        y_ds.attrs['units'] = np.bytes_("m")
 
     else:
         raise NotImplementedError('Waiting for implementation / Not supported in ISCE3')
@@ -351,8 +351,8 @@ def save_orbit(orbit, orbit_direction, orbit_type, orbit_group):
         add_dataset_and_attrs(orbit_group, meta_item)
 
     orbit_ds = orbit_group.require_dataset("orbit_type", (), "S10",
-                                           data=np.string_(orbit_type))
-    orbit_ds.attrs["description"] = np.string_("Type of orbit file used for processing. "
+                                           data=np.bytes_(orbit_type))
+    orbit_ds.attrs["description"] = np.bytes_("Type of orbit file used for processing. "
                                                "RESORB: restituted orbit ephemeris or POEORB: precise orbit ephemeris")
 
 
@@ -507,7 +507,7 @@ def metadata_to_h5group(parent_group, burst, cfg, save_noise_and_cal=True,
 
     # runconfig yaml text
     processing_group['runconfig'] = cfg.yaml_string
-    processing_group['runconfig'].attrs['description'] = np.string_('Run configuration file used to generate the CSLC-S1 product')
+    processing_group['runconfig'].attrs['description'] = np.bytes_('Run configuration file used to generate the CSLC-S1 product')
 
     # input items
     orbit_files = [os.path.basename(f) for f in cfg.orbit_path]

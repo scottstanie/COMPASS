@@ -120,15 +120,15 @@ def run(cfg: GeoRunConfig):
 
         with h5py.File(output_hdf5, 'w') as geo_burst_h5:
             geo_burst_h5.attrs['conventions'] = "CF-1.8"
-            geo_burst_h5.attrs["contact"] = np.string_(OPERA_OPERATION_CONTACT_EMAIL)
-            geo_burst_h5.attrs["institution"] = np.string_("NASA JPL")
-            geo_burst_h5.attrs["project_name"] = np.string_("OPERA")
-            geo_burst_h5.attrs["reference_document"] = np.string_("JPL-108278")
-            geo_burst_h5.attrs["title"] = np.string_("OPERA_L2_CSLC-S1 Product")
+            geo_burst_h5.attrs["contact"] = np.bytes_(OPERA_OPERATION_CONTACT_EMAIL)
+            geo_burst_h5.attrs["institution"] = np.bytes_("NASA JPL")
+            geo_burst_h5.attrs["project_name"] = np.bytes_("OPERA")
+            geo_burst_h5.attrs["reference_document"] = np.bytes_("JPL-108278")
+            geo_burst_h5.attrs["title"] = np.bytes_("OPERA_L2_CSLC-S1 Product")
 
             # add type to root for GDAL recognition of datasets
             ctype = h5py.h5t.py_create(np.complex64)
-            ctype.commit(geo_burst_h5['/'].id, np.string_('complex64'))
+            ctype.commit(geo_burst_h5['/'].id, np.bytes_('complex64'))
 
             grid_group = geo_burst_h5.require_group(DATA_PATH)
             check_eap = is_eap_correction_necessary(burst.ipf_version)
